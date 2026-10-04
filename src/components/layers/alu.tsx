@@ -1,0 +1,13 @@
+import { binary } from "@/core/alu";
+import { signed } from "@/core/limits";
+import { Block, Diagram, Wire } from "../shared/diagram";
+import type { LayerProps } from "../shared/types";
+import { focusedAddition, focusedHardware } from "@/core/trace/demo";
+import { BitwiseALU } from "./bitwise";
+export function ALULayer(props: LayerProps) {
+  const { demo, operationId, address } = props;
+  const hardware = focusedHardware(demo, operationId, address)!;
+  if (hardware.class === "bitwise") return <BitwiseALU {...props} operation={hardware} />;
+  const a = focusedAddition(demo, operationId, address)!, alu = demo.frames[a.cycleIndex].alu!;
+  return <div className="alu-scene"><div className="decimal-equation"><span>{signed(a.left)}</span><b>{a.operator}</b><span>{signed(a.right)}</span><span className="muted">=</span><strong>{signed(alu.output)}</strong></div><Diagram label={`Actual ALU inputs D ${alu.x}, M ${alu.y}; output ${alu.output}`} viewBox="0 0 800 330"><Wire d="M250 68 H325 V130" label={`M = ${alu.y}`} x={275} y={52} /><Wire d="M550 68 H475 V130" label={`D = ${alu.x}`} x={524} y={52} /><Wire d="M400 210 V260" label={String(alu.output)} x={423} y={244} /><Block x={50} y={32} width={200} title="Input y · memory" value={binary(alu.y)} /><Block x={550} y={32} width={200} title="Input x · D register" value={binary(alu.x)} /><Block anchorId="alu-add" x={280} y={130} width={240} height={80} title="16-bit ALU" value={a.operator === "+" ? "ADD" : "SUB · M - D"} /><Block x={280} y={260} width={240} height={65} title="Output" value={binary(alu.output)} /></Diagram><div className="binary-calculation"><span className="eyebrow">{a.operator === "+" ? "THE SAME ARITHMETIC, IN BINARY" : "ADDER IDENTITY: x - y = x + NOT(y) + 1"}</span><div><span>{a.left}</span><code>{binary(a.left)}</code></div><div><span>+ {a.hardwareRight}</span><code>{binary(a.hardwareRight)}</code></div>{a.carryIn > 0 && <div><span>+ carry-in</span><code>0000000000000001</code></div>}<div className="binary-sum"><span>= {alu.output}</span><code>{binary(alu.output)}</code></div></div><div className="control-strip"><span>ACTUAL ALU CONTROLS</span><code>zx nx zy ny f no</code><code>{Object.values(alu.controls).map(Number).join("  ")}</code></div><p className="scene-note">{a.operator === "+" ? "These two inputs enter the adder without inversion." : "The real M-D instruction transforms its inputs/output using the controls above. The gates view uses the equivalent x + NOT(y) + 1 adder, whose result matches this CPU edge."}<br />The low sixteen bits wrap on overflow. Raw output {alu.output} = signed {signed(alu.output)}.</p></div>;
+}

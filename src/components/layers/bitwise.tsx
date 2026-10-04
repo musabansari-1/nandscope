@@ -1,0 +1,20 @@
+import { binary } from "@/core/alu";
+import { signed } from "@/core/limits";
+import type { BitwiseTrace } from "@/core/trace/hardware";
+import { BitPicker, Block, Diagram, Wire } from "../shared/diagram";
+import type { LayerProps } from "../shared/types";
+
+export function BitwiseALU({ operation: h, demo }: LayerProps & { operation: BitwiseTrace }) {
+  const alu = demo.frames[h.cycleIndex].alu!;
+  return <div className="alu-scene bitwise-scene"><div className="decimal-equation">{h.operator === "~" && <b>~</b>}<span>{signed(h.left)}</span>{h.operator !== "~" && <><b>{h.operator}</b><span>{signed(h.right)}</span></>}<span className="muted">=</span><strong>{signed(h.output)}</strong></div>
+    <Diagram label={`ALU ${h.primitive.toUpperCase()} on sixteen bits, output ${h.output}`} viewBox="0 0 800 330"><Wire d="M250 68 H325 V130" label={`M = ${alu.y}`} x={275} y={52} /><Wire d="M550 68 H475 V130" active={h.operator !== "~"} label={h.operator === "~" ? "D unused" : `D = ${alu.x}`} x={524} y={52} /><Wire d="M400 210 V260" label={String(h.output)} x={423} y={244} /><Block x={50} y={32} width={200} title="Memory input" value={binary(h.left)} /><Block x={550} y={32} width={200} title="D register" value={h.operator === "~" ? "unused" : binary(h.right)} active={h.operator !== "~"} /><Block anchorId="alu-add" x={280} y={130} width={240} height={80} title="16-bit ALU" value={h.primitive.toUpperCase()} /><Block x={280} y={260} width={240} height={65} title="Output" value={binary(h.output)} /></Diagram>
+    <div className="binary-calculation"><span className="eyebrow">CORRESPONDING BITS WORK INDEPENDENTLY</span><div><span>{h.left}</span><code>{binary(h.left)}</code></div>{h.operator !== "~" && <div><span>{h.operator} {h.right}</span><code>{binary(h.right)}</code></div>}<div className="binary-sum"><span>= {h.output}</span><code>{binary(h.output)}</code></div></div>
+    <div className="control-strip"><span>ACTUAL ALU CONTROLS</span><code>zx nx zy ny f no</code><code>{Object.values(alu.controls).map(Number).join("  ")}</code></div><p className="scene-note">Each output bit comes from its own {h.primitive.toUpperCase()} operation. No bit waits for a carry from its neighbor.<br />Raw output {h.output} · 0x{h.output.toString(16).padStart(4, "0").toUpperCase()} · signed {signed(h.output)}.</p></div>;
+}
+
+export function BitwiseGates({ operation: h, bit, onBit }: LayerProps & { operation: BitwiseTrace }) {
+  const s = h.slices[bit], unary = h.primitive === "not";
+  return <div className="gates-scene bitwise-scene"><BitPicker bit={bit} onBit={onBit} /><div className="slice-values"><span>A<sub>{bit}</sub> = <b>{s.a}</b></span>{!unary && <span>B<sub>{bit}</sub> = <b>{s.b}</b></span>}<span className="slice-result">Output = <b>{s.output}</b></span></div>
+    <Diagram label={`Bit ${bit}: ${unary ? `NOT ${s.a}` : `${s.a} ${h.primitive.toUpperCase()} ${s.b}`} = ${s.output}`} viewBox="0 0 800 280"><g data-visual-anchor="gate-bitwise"><Wire d="M170 85 H320" label={`A = ${s.a}`} x={225} y={65} />{!unary && <Wire d="M170 195 H260 V145 H320" label={`B = ${s.b}`} x={225} y={220} />}<Block anchorId={`gate-${h.primitive}`} x={320} y={70} width={190} height={110} title={h.primitive.toUpperCase()} value={String(s.output)} /><Wire d="M510 125 H690" label={`OUTPUT = ${s.output}`} x={615} y={102} /></g></Diagram>
+    <div className="gate-formulas"><code>out = {unary ? "NOT A" : `A ${h.primitive.toUpperCase()} B`}</code></div><div className="parallel-bits" aria-label="Sixteen independent output bits">{[...h.slices].reverse().map(s => <button key={s.index} aria-pressed={s.index === bit} aria-label={`Inspect bit ${s.index}, output ${s.output}`} onClick={() => onBit(s.index)}><small>{s.index}</small><code>{s.output}</code></button>)}</div><p className="scene-note">The same primitive works independently at all sixteen positions. Select a bit, then zoom down to its {unary ? "one NAND with tied inputs" : h.primitive === "and" ? "two NAND gates" : "three NAND gates"}.</p></div>;
+}

@@ -1,0 +1,65 @@
+/* Persistent shell, overlapping scene planes, and a single clipped focal overlay. */
+.execution-slot { flex-shrink: 0; }
+.execution-slot-hidden { visibility: hidden; }
+.microscope-stage { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); align-items: center; overflow: auto; scrollbar-width: thin; scrollbar-color: #49443b transparent; overscroll-behavior: contain; isolation: isolate; padding: 20px 0; }
+.microscope-stage > .layer-scene { grid-area: 1 / 1; width: 100%; min-width: 0; max-height: 100%; }
+.microscope-stage[data-phase]:not([data-phase="idle"]) { overflow: hidden; }
+.layer-scene { transform-origin: center; }
+.scene-source { position: absolute; inset: 20px 0; display: flex; align-items: center; pointer-events: none; transition: opacity 180ms ease, transform 420ms cubic-bezier(.22,.7,.22,1); }
+.scene-source > div { width: 100%; }
+.scene-destination { opacity: 0; transition: opacity 200ms ease; }
+[data-phase="source-exiting"] .scene-source { opacity: .12; transform: scale(1.025); }
+[data-phase="source-exiting"] .scene-destination { opacity: .08; }
+[data-phase="morphing"] .scene-destination { opacity: .16; }
+[data-phase="source-exiting"] .scene-destination .bit-field > :not(code), [data-phase="morphing"] .scene-destination .bit-field > :not(code) { visibility: hidden; }
+[data-phase="morphing"] .scene-source, [data-phase="destination-entering"] .scene-source { opacity: 0; transform: scale(1.04); }
+[data-direction="shallower"][data-phase="source-exiting"] .scene-source { transform: scale(.96); }
+[data-phase="destination-entering"] .scene-destination { opacity: 1; transform: scale(1); }
+.microscope-stage > .microscope-overlay { position: absolute; inset: 0; z-index: 3; overflow: hidden; pointer-events: none; max-width: none; margin: 0; width: auto; }
+.microscope-object { position: absolute; min-width: 0; pointer-events: none; }
+.microscope-object > * { box-sizing: border-box; }
+.full-adder-interface { border: 1px solid #9a7954; border-radius: 10px; background: #24221a; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; color: var(--accent); font: 12px Consolas, monospace; }
+.full-adder-interface strong { color: var(--text); font: 500 19px "Segoe UI", sans-serif; }
+.assembly-lines button.arithmetic-instruction { box-shadow: inset 2px 0 #b5895f; }
+.ladder button[aria-disabled="true"] { cursor: default; }
+@media (min-width: 981px) {
+  .workspace { height: 100dvh; min-height: 850px; }
+  .workspace-body { min-height: 0; }
+  .main-panel { min-height: 0; }
+  .microscope-stage { min-height: 0; }
+  .why-panel { overflow-y: auto; scrollbar-width: thin; }
+  .cpu-scene .diagram { max-height: 370px; }
+  .alu-scene .diagram { max-height: 230px; }
+  .gates-scene .diagram { max-height: 310px; }
+  .nand-scene .diagram { max-height: 280px; }
+  .vm-line { padding-top: 11px; padding-bottom: 11px; }
+  .vm-scene .instruction-note { margin-top: 16px; padding: 11px; }
+  .stack-transform { margin-top: 22px; margin-bottom: 22px; }
+  .stack-value { min-height: 34px; }
+  .stack-empty { height: 17px; }
+  .scene-note { margin-top: 16px; }
+  .bit-picker { margin-bottom: 16px; }
+  .slice-values { margin-bottom: 18px; }
+  .gate-formulas { margin-top: 9px; margin-bottom: 16px; }
+  .carry-chain { margin-top: 12px; margin-bottom: 16px; }
+  .primitive-picker { padding-top: 15px; }
+}
+@media (max-width: 980px) {
+  .microscope-stage { height: 660px; min-height: 0; flex: none; }
+}
+@media (max-width: 650px) {
+  .execution-slot-hidden { display: none; }
+  .view-heading { min-height: 109px; }
+  .microscope-stage > .layer-scene { align-self: start; }
+  .scene-source { align-items: flex-start; }
+  .scene-source { top: 25px; bottom: 25px; }
+  .scene-source, .scene-destination { transform: none !important; }
+  .full-adder-interface { gap: 8px; font-size: 9px; }
+  .full-adder-interface strong { font-size: 13px; }
+}
+@media (max-height: 800px) and (min-width: 981px) { .scene-source { top: 20px; bottom: 20px; } }
+[data-motion="reduced"] .scene-source, [data-motion="reduced"] .scene-destination { transform: none !important; transition: opacity 80ms linear; }
+@media (prefers-reduced-motion: reduce) {
+  .scene-source, .scene-destination { transform: none !important; }
+  [data-phase="morphing"] .scene-destination { opacity: .35; }
+}
