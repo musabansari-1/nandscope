@@ -6,7 +6,7 @@ export type PlaybackSpeed = keyof typeof PLAYBACK_DELAYS;
 export interface PlaybackState { focus: ExecutionFocus; playing: boolean; speed: PlaybackSpeed }
 export type PlaybackAction = { type: "play" | "pause" | "tick" | "reset" } | { type: "speed"; speed: PlaybackSpeed } | { type: "inspect"; action: ExecutionAction };
 export function initialPlayback(demo: Demo): PlaybackState {
-  return { focus: { operationId: demo.hardware[0]?.operationId ?? demo.focuses[0].id, address: 0, cycleIndex: 0 }, playing: false, speed: "1" };
+  return { focus: { operationId: demo.hardware[0]?.operationId ?? demo.focuses[0].id, address: 0, cycleIndex: 0 }, playing: false, speed: "2" };
 }
 export function updatePlayback(demo: Demo, state: PlaybackState, action: PlaybackAction): PlaybackState {
   const current = state.focus.cycleIndex ?? state.focus.address, last = demo.frames.length - 1;
