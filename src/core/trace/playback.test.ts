@@ -33,7 +33,7 @@ describe("runtime playback state", () => {
   });
 });
 describe("cancellable playback timer", () => {
-  it.each(["0.5", "1", "2"] as const)("schedules exactly one edge at %s×", speed => {
+  it.each(["0.5", "1", "2", "4"] as const)("schedules exactly one edge at %s×", speed => {
     vi.useFakeTimers();const tick=vi.fn();const clean=schedulePlaybackTick(true,speed,tick);
     vi.advanceTimersByTime(PLAYBACK_DELAYS[speed]-1);expect(tick).not.toHaveBeenCalled();vi.advanceTimersByTime(1);expect(tick).toHaveBeenCalledOnce();vi.advanceTimersByTime(5000);expect(tick).toHaveBeenCalledOnce();clean();expect(vi.getTimerCount()).toBe(0);
   });
