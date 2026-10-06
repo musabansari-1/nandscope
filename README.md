@@ -6,6 +6,10 @@ NANDscope is a small educational programming system. A typed source AST is compi
 
 NANDscope now also answers **what changed**, **why this value**, and **how much machine work**. Guided remains the first visit. Explorer provides Compare, Share this view, Showcase, a collapsed Machine cost section, and a contextual “Why is …?” action on initialized named memory and written array cells.
 
+## Release review test note
+
+This documentation-only section exists to provide a harmless pull request for validating automated release-risk analysis. It does not change runtime behavior, dependencies, infrastructure, APIs, database state, or deployment configuration.
+
 ## Source-to-silicon debugging
 
 - **Compare:** both sources independently pass through `createDemo`. Three presets cover addition vs AND, false vs true branches, and an inserted indirect write. Source blocks align by kind and target within their enclosing IF/ELSE/loop/function region. VM visits align by expression position, command family, call-name path and chronological occurrence. Missing visits remain explicit; cycles are never assumed equal. Six focused views connect source, VM, assembly, decoded machine fields, CPU and hardware. The first different recorded edge is separate from the first different conditional PC decision. The latter exposes real jump outcomes and subsequent executed source blocks.
