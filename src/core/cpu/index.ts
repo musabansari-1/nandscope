@@ -49,7 +49,7 @@ export function executeRun(rom: number[], options: { keyboard?: number; maxCycle
   const maxCycles = Math.min(options.maxCycles ?? LIMITS.cycles, LIMITS.cycles);
   while (state.pc < rom.length) {
     if (frames.length >= maxCycles) { stopReason = `Execution stopped after ${maxCycles} cycles. The program may contain an infinite loop or excessive recursion.`; break; }
-    if (state.ram[0] >= LIMITS.stackEnd || state.ram[0] < 256) { stopReason = `Execution stopped: stack exceeded RAM[256..${LIMITS.stackEnd - 1}].`; break; }
+    if (state.ram[0] >= LIMITS.heapStart || state.ram[0] < 256) { stopReason = `Execution stopped: stack exceeded RAM[256..${LIMITS.heapStart - 1}].`; break; }
     const frame = executeMachineInstruction(state, rom[state.pc]);
     frame.index = frames.length; frame.cycleIndex = frames.length;
     frames.push(frame); state = frame.after;
