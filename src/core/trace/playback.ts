@@ -1,7 +1,7 @@
 import type { Demo } from "./demo";
 import { updateExecution, type ExecutionAction, type ExecutionFocus } from "./execution";
 
-export const PLAYBACK_DELAYS = { "0.5": 900, "1": 450, "2": 225 } as const;
+export const PLAYBACK_DELAYS = { "0.5": 900, "1": 450, "2": 225, "4": 110 } as const;
 export type PlaybackSpeed = keyof typeof PLAYBACK_DELAYS;
 export interface PlaybackState { focus: ExecutionFocus; playing: boolean; speed: PlaybackSpeed }
 export type PlaybackAction = { type: "play" | "pause" | "tick" | "reset" } | { type: "speed"; speed: PlaybackSpeed } | { type: "inspect"; action: ExecutionAction };
